@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CashGuard — проверка кассовой дисциплины</title>
+  <meta name="theme-color" content="#4a0221">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/static/fonts/opensans-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7Z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-8.5 8.5M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 17.6A2 2 0 0 0 4.3 20.6h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0ZM12 9.5v4.2m0 3.3v.1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="m8.3 12.3 2.5 2.5 5-5.2"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8Zm0 0V8h4.5M9 12.5h6M9 16h6"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="m3.5 15.5 4.6-4.3a1.5 1.5 0 0 1 2 0l4.4 4.3m-1.5-1.5 1.6-1.5a1.5 1.5 0 0 1 2 0l3.4 3.1"/><circle cx="15.5" cy="9.3" r="1.3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11m0-11-11 11"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8.5 8-4 4 4 4m7-8 4 4-4 4"/></symbol>
+  <symbol id="i-mark" viewBox="0 0 24 24"><path d="M12 2.8 19.5 5.6v6.1c0 4.6-3.1 8-7.5 9.6-4.4-1.6-7.5-5-7.5-9.6V5.6Z"/><path d="M8.6 8.7h6.8M8.6 11.4h6.8M12 11.4v5.3"/></symbol>
+</svg>
+
+<header class="appbar">
+  <div class="wrap appbar-inner">
+    <a class="logo" href="/" aria-label="CashGuard, новая проверка">
+      <span class="mark"><svg class="ico"><use href="#i-mark"/></svg></span>
+      <span class="logo-text">
+        <span class="logo-name">CashGuard</span>
+        <span class="logo-sub">Кассовая дисциплина по видео</span>
+      </span>
+    </a>
+    <div class="appbar-right">
+      <span class="case-tag">Решение кейса ForteBank · Datathon&nbsp;26</span>
+      <span class="health" id="health" data-state="wait" title="Модели работают на сервере сервиса, без внешних API">
+        <span class="dot"></span><span id="healthText">Проверка сервиса…</span>
+      </span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="upload" aria-labelledby="heroTitle">
+    <div class="hero-copy">
+      <h1 id="heroTitle">Проверка видео с кассы</h1>
+      <p class="hero-lead">Загрузите запись кассового помещения. Сервис найдёт признаки нарушений кассовой
+        дисциплины, отметит момент на видео, приложит кадры и пункт нормы.</p>
+      <ul class="gets">
+        <li><svg class="ico"><use href="#i-tick"/></svg>Вердикт по ролику</li>
+        <li><svg class="ico"><use href="#i-tick"/></svg>Таймкод каждого нарушения</li>
+        <li><svg class="ico"><use href="#i-tick"/></svg>Кадры-доказательства</li>
+        <li><svg class="ico"><use href="#i-tick"/></svg>Пункт НПА с цитатой</li>
+      </ul>
+    </div>
+    <div class="dropcard">
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept=".mov,.mp4,.m4v,video/*">
+        <span class="drop-ico"><svg class="ico"><use href="#i-upload"/></svg></span>
+        <span class="drop-main" id="dropText">Перетащите видео сюда или выберите файл</span>
+        <span class="hint">.mov или .mp4, до 200 МБ</span>
+      </label>
+      <div class="actions">
+        <button type="button" class="btn primary" id="start" disabled>Проверить видео</button>
+        <span class="file-info" id="fileInfo"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card status hidden" id="status" aria-live="polite">
+    <ol class="steps" id="steps" aria-label="Этапы проверки">
+      <li data-step="upload"><span class="step-dot"><svg class="ico"><use href="#i-tick"/></svg></span>Загрузка</li>
+      <li data-step="queue"><span class="step-dot"><svg class="ico"><use href="#i-tick"/></svg></span>Очередь</li>
+      <li data-step="analyze"><span class="step-dot"><svg class="ico"><use href="#i-tick"/></svg></span>Анализ</li>
+      <li data-step="done"><span class="step-dot"><svg class="ico"><use href="#i-tick"/></svg></span>Результат</li>
+    </ol>
+    <div class="status-line">
+      <span id="statusText"></span>
+      <span class="status-time" id="statusTime"></span>
+    </div>
+    <div class="progress hidden" id="progress"><div id="bar"></div></div>
+    <div class="error hidden" id="errorText" role="alert"></div>
+  </section>
+
+  <section class="hidden" id="result" aria-labelledby="verdictTitle">
+    <div class="case" id="verdict">
+      <div class="case-main">
+        <div class="case-file" id="caseFile"></div>
+        <h2 class="verdict-title" id="verdictTitle"></h2>
+        <div class="verdict-meta" id="verdictMeta"></div>
+      </div>
+      <div class="verdict-chip" id="verdictChip"></div>
+    </div>
+
+    <div class="workspace">
+      <div class="player card">
+        <div class="video-box"><video id="video" controls preload="metadata" playsinline></video></div>
+        <div class="scrub">
+          <div class="timeline" id="timeline" title="Перейти к моменту">
+            <div class="track"></div>
+            <div class="head" id="playhead"></div>
+          </div>
+          <div class="timeline-scale"><span>00:00</span><span id="durLabel"></span></div>
+        </div>
+        <div class="lanes hidden" id="lanes" aria-label="Что происходило в кадре по времени"></div>
+        <div class="novideo" id="noVideo"></div>
+      </div>
+
+      <div class="findings">
+        <div class="list" id="violations"></div>
+        <details class="card json">
+          <summary><svg class="ico"><use href="#i-code"/></svg>Ответ API (JSON)<svg class="ico chev"><use href="#i-chev"/></svg></summary>
+          <pre id="json"></pre>
+        </details>
+        <p class="note">Результат — подсказка для проверяющего, а не окончательное юридическое или
+          дисциплинарное заключение. Сервис отмечает только то, что видно в кадре.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card history hidden" id="historyPanel" aria-labelledby="historyTitle">
+    <h2 id="historyTitle">Проверки в этом браузере</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Файл</th><th class="when">Загружено</th><th>Результат</th><th><span class="sr">Действие</span></th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <span>CashGuard · решение кейса ForteBank для Datathon 26. Видео обрабатывается моделями на сервере сервиса, без внешних API.</span>
+    <a href="/docs" target="_blank" rel="noopener">Документация API<svg class="ico"><use href="#i-ext"/></svg></a>
+  </div>
+</footer>
+
+<div class="viewer hidden" id="viewer" role="dialog" aria-modal="true" aria-label="Кадр-доказательство">
+  <figure>
+    <img id="viewerImg" alt="Кадр-доказательство">
+    <figcaption>
+      <span id="viewerCap"></span>
+      <button type="button" class="btn light" id="viewerSeek"><svg class="ico"><use href="#i-play"/></svg>Перейти к моменту</button>
+      <button type="button" class="btn ghost-light" id="viewerClose"><svg class="ico"><use href="#i-close"/></svg>Закрыть</button>
+    </figcaption>
+  </figure>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
