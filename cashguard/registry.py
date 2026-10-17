@@ -25,7 +25,7 @@ REGISTRY = {
         "verified": True, "direct": False,
     },
     "C_cash_on_desk_next_client": {
-        "name": "Наличные предыдущей операции открыто на столе",
+        "name": "Наличные предыдущей операции оставлены открыто на столе",
         "template": "В помещение входит следующий посетитель ({t:.1f} с), на столе открыто лежат "
                     "наличные, оставшиеся после предыдущей операции.",
         "norm": f"{RULES_231}, п. 20 ч. 2 (ранее принятые деньги хранятся в устройствах, "
@@ -96,6 +96,10 @@ REGISTRY = {
     },
 }
 
+
+# Типы, которые сервис определяет автоматически (D, I, J описаны, но правила выключены)
+ACTIVE = ("A_unattended_valuables", "B_safe_open", "C_cash_on_desk_next_client", "E_unauthorized_person",
+          "F_bag_no_check", "G_personal_items", "H_door_open", "L_workstation_unlocked")
 
 # Пункты с дословной цитатой и ссылкой на абзац adilet (cashguard/norms.py, из проверенного реестра)
 REFS = {

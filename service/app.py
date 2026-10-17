@@ -18,6 +18,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import APIKeyHeader
 from fastapi.staticfiles import StaticFiles
 
+from cashguard.registry import ACTIVE, REGISTRY, refs
+
 from .jobs import Dispatcher, JobStore
 from .logs import setup_logging
 
@@ -28,6 +30,12 @@ API_KEY = os.environ.get("CASHGUARD_API_KEY", "")
 TIMEOUT_SEC = float(os.environ.get("CASHGUARD_JOB_TIMEOUT", "300"))
 MAX_UPLOAD = int(float(os.environ.get("CASHGUARD_MAX_UPLOAD_MB", "200")) * 1024 * 1024)
 KEEP_API_VIDEOS = os.environ.get("CASHGUARD_KEEP_API_VIDEOS", "0") == "1"
+# готовые проверки, которые интерфейс показывает как примеры (job_id через запятую)
+EXAMPLES = [x.strip() for x in os.environ.get("CASHGUARD_EXAMPLES", "").split(",") if x.strip()]
+
+# названия типов из прежних версий: старые задачи в интерфейсе показываются с текущим названием
+NAME2CODE = {r["name"]: code for code, r in REGISTRY.items()}
+NAME2CODE["Наличные предыдущей операции открыто на столе"] = "C_cash_on_desk_next_client"
 
 UPLOADS = DATA / "uploads"
 LOG_FILE = DATA / "service.log"
@@ -171,6 +179,41 @@ def ui_status(request: Request, job_id: str):
         "timeline": res.get("timeline"),
         "video_url": f"/ui/video/{job_id}" if Path(j["video"]).exists() else None,
     })
+    return ui_normalize(out)
+
+
+def ui_normalize(out: dict) -> dict:
+    """Задачи, обработанные прежней версией: текущее название типа и нормы с цитатами (копии, хранилище не меняется)."""
+    out["violations"] = [dict(v) for v in out.get("violations") or []]
+    out["explain"] = [dict(x) for x in out.get("explain") or []]
+    for i, v in enumerate(out["violations"]):
+        code = NAME2CODE.get(v.get("type"))
+        if not code:
+            continue
+        v["type"] = REGISTRY[code]["name"]
+        if i < len(out["explain"]) and not out["explain"][i].get("refs"):
+            out["explain"][i]["refs"] = refs(code)
+    return out
+
+
+@app.get("/ui/api/rules", include_in_schema=False)
+def ui_rules():
+    return [{"code": code[0], "name": REGISTRY[code]["name"]} for code in ACTIVE]
+
+
+@app.get("/ui/api/examples", include_in_schema=False)
+def ui_examples(request: Request):
+    out = []
+    for job_id in EXAMPLES:
+        j = request.app.state.store.get(job_id)
+        if not j or j["source"] != "ui" or j["status"] != "done":
+            continue
+        res = j["result"] or {}
+        out.append({"job_id": job_id, "filename": j["filename"], "verdict": res.get("verdict"),
+                    "n": len(res.get("violations") or []),
+                    "types": [REGISTRY[NAME2CODE[v["type"]]]["name"] if v["type"] in NAME2CODE else v["type"]
+                              for v in res.get("violations") or []],
+                    "duration_sec": (res.get("meta") or {}).get("duration_sec")})
     return out
 
 
