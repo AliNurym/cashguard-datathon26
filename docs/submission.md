@@ -7,6 +7,7 @@
 | Что | Значение |
 |---|---|
 | Веб-интерфейс | <https://136-80-9-18.sslip.io/> |
+| Исходный код | <https://github.com/AliNurym/cashguard-datathon26> |
 | API | `https://136-80-9-18.sslip.io/api/v1/analyze`, `https://136-80-9-18.sslip.io/api/v1/jobs/{job_id}` |
 | Ключ API | передаётся жюри отдельно, заголовок `X-API-Key` |
 | Документация API | <https://136-80-9-18.sslip.io/docs> |
