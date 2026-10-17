@@ -64,6 +64,19 @@ bash ~/cashguard/deploy/gcp_setup.sh
 
 Ожидается: `done` у всех, `schema_bad: []`, 401 без ключа. Затем открыть интерфейс с телефона через мобильный интернет: это проверка, что адрес виден снаружи.
 
+## 5. Примеры на стартовом экране (по желанию)
+
+Загрузить 2–3 ролика через интерфейс (или `POST /ui/api/analyze`), дождаться результата и прописать их `job_id`:
+
+```bash
+sudo mkdir -p /etc/systemd/system/cashguard.service.d
+printf "[Service]\nEnvironment=CASHGUARD_EXAMPLES=<id1>,<id2>,<id3>\n" | sudo tee /etc/systemd/system/cashguard.service.d/examples.conf
+sudo systemctl daemon-reload && sudo systemctl restart cashguard
+curl -s https://<адрес>/ui/api/examples
+```
+
+Задачи и видео примеров лежат в `~/cashguard/data/service`: пока эта папка цела, примеры переживают перезапуск.
+
 ## Если что-то пошло не так
 
 | Симптом | Что сделать |
